@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -14,7 +14,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -44,15 +44,26 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+const SelectedContext = createContext({
+  selected: '',
+  setSelected: (s: string) => {}
+})
+
+export const useSelected = () => {
+  return useContext(SelectedContext)
+}
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-
+  const [selected, setSelected] = useState('')
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <SelectedContext.Provider value={{selected, setSelected}}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
+      </SelectedContext.Provider>
     </ThemeProvider>
   );
 }
